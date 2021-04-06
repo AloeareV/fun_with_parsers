@@ -1,0 +1,26 @@
+getreceivedbyaddress "zcashaddress" ( minconf ) ( inZat )
+
+Returns the total amount received by the given Zcash address in transactions with at least minconf confirmations.
+
+Arguments:
+1. "zcashaddress"  (string, required) The Zcash address for transactions.
+2. minconf         (numeric, optional, default=1) Only include transactions confirmed at least this many times.
+3. inZat           (bool, optional, default=false) Get the result amount in zatoshis (as an integer).
+
+Result:
+amount   (numeric) The total amount in ZEC(or zatoshis if inZat is true) received at this address.
+
+Examples:
+
+The amount from transactions with at least 1 confirmation
+> zcash-cli getreceivedbyaddress "t14oHp2v54vfmdgQ3v3SNuQga8JKHTNi2a1"
+
+The amount including unconfirmed transactions, zero confirmations
+> zcash-cli getreceivedbyaddress "t14oHp2v54vfmdgQ3v3SNuQga8JKHTNi2a1" 0
+
+The amount with at least 6 confirmations, very safe
+> zcash-cli getreceivedbyaddress "t14oHp2v54vfmdgQ3v3SNuQga8JKHTNi2a1" 6
+
+As a json rpc call
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getreceivedbyaddress", "params": ["t14oHp2v54vfmdgQ3v3SNuQga8JKHTNi2a1", 6] }' -H 'content-type: text/plain;' http://127.0.0.1:8232/
+

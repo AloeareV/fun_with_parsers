@@ -1,0 +1,16 @@
+getaccountaddress "account"
+
+DEPRECATED. Returns the current Zcash address for receiving payments to this account.
+
+Arguments:
+1. "account"       (string, required) MUST be set to the empty string "" to represent the default account. Passing any other string will result in an error.
+
+Result:
+"zcashaddress"   (string) The account Zcash address
+
+Examples:
+> zcash-cli getaccountaddress 
+> zcash-cli getaccountaddress ""
+> zcash-cli getaccountaddress "myaccount"
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getaccountaddress", "params": ["myaccount"] }' -H 'content-type: text/plain;' http://127.0.0.1:8232/
+

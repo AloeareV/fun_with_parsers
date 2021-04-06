@@ -1,0 +1,26 @@
+addmultisigaddress nrequired ["key",...] ( "account" )
+
+Add a nrequired-to-sign multisignature address to the wallet.
+Each key is a Zcash address or hex-encoded public key.
+If 'account' is specified (DEPRECATED), assign address to that account.
+
+Arguments:
+1. nrequired        (numeric, required) The number of required signatures out of the n keys or addresses.
+2. "keysobject"   (string, required) A json array of Zcash addresses or hex-encoded public keys
+     [
+       "address"  (string) Zcash address or hex-encoded public key
+       ...,
+     ]
+3. "account"      (string, optional) DEPRECATED. If provided, MUST be set to the empty string "" to represent the default account. Passing any other string will result in an error.
+
+Result:
+"zcashaddress"  (string) A Zcash address associated with the keys.
+
+Examples:
+
+Add a multisig address from 2 addresses
+> zcash-cli addmultisigaddress 2 "[\"t16sSauSf5pF2UkUwvKGq4qjNRzBZYqgEL5\",\"t171sgjn4YtPu27adkKGrdDwzRTxnRkBfKV\"]"
+
+As json rpc call
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "addmultisigaddress", "params": [2, "[\"t16sSauSf5pF2UkUwvKGq4qjNRzBZYqgEL5\",\"t171sgjn4YtPu27adkKGrdDwzRTxnRkBfKV\"]"] }' -H 'content-type: text/plain;' http://127.0.0.1:8232/
+

@@ -1,0 +1,12 @@
+setaccount "zcashaddress" "account"
+
+DEPRECATED. Sets the account associated with the given address.
+
+Arguments:
+1. "zcashaddress"  (string, required) The Zcash address to be associated with an account.
+2. "account"         (string, required) MUST be set to the empty string "" to represent the default account. Passing any other string will result in an error.
+
+Examples:
+> zcash-cli setaccount "t14oHp2v54vfmdgQ3v3SNuQga8JKHTNi2a1" "tabby"
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "setaccount", "params": ["t14oHp2v54vfmdgQ3v3SNuQga8JKHTNi2a1", "tabby"] }' -H 'content-type: text/plain;' http://127.0.0.1:8232/
+
