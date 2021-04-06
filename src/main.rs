@@ -60,6 +60,8 @@ mod combinators {
                 .map(|(remainder, output)| (remainder, map_fn(output)))
         }
     }
+
+    //pub(crate) fn
 }
 
 fn literal_match_parser<'a, 'b: 'a>(
@@ -87,6 +89,22 @@ fn read_word(input: &str) -> ParseResult<'_, &str> {
     }
 }
 
+fn split<'a, 'b: 'a>(pattern: &'b str) -> impl Parser<'a, &'a str> {
+    move |input: &'a str| {
+        let mut i = 0;
+        loop {
+            break if input[i..].len() < pattern.len() {
+                Err(input)
+            } else if input[i..].starts_with(pattern) {
+                Ok((&input[(i + pattern.len())..], &input[..i]))
+            } else {
+                i += 1;
+                continue;
+            };
+        }
+    }
+}
+
 fn rpc_name(input: &str) -> ParseResult<'_, String> {
     combinators::map(
         combinators::pair(
@@ -97,8 +115,12 @@ fn rpc_name(input: &str) -> ParseResult<'_, String> {
     )(input)
 }
 fn main() {
-    let example =
+    let example1 =
         std::fs::read_to_string("quizface_help/z_getoperationresult.txt")
             .unwrap();
-    dbg!(rpc_name(&example));
+    let example2 =
+        std::fs::read_to_string("quizface_help/getaddressbalance.txt").unwrap();
+    let parse = combinators::pair(rpc_name, split("Arguments:"));
+    dbg!(parse(&example1));
+    dbg!(parse(&example2));
 }
