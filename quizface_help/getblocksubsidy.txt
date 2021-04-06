@@ -1,0 +1,26 @@
+getblocksubsidy height
+
+Returns block subsidy reward, taking into account the mining slow start and the founders reward, of block at index provided.
+
+Arguments:
+1. height         (numeric, optional) The block height.  If not provided, defaults to the current height of the chain.
+
+Result:
+{
+  "miner" : x.xxx,              (numeric) The mining reward amount in ZEC.
+  "founders" : x.xxx,           (numeric) The founders' reward amount in ZEC.
+  "fundingstreams" : [          (array) An array of funding stream descriptions (present only when Canopy has activated).
+    {
+      "recipient" : "...",        (string) A description of the funding stream recipient.
+      "specification" : "url",    (string) A URL for the specification of this funding stream.
+      "value" : x.xxx             (numeric) The funding stream amount in ZEC.
+      "valueZat" : xxxx           (numeric) The funding stream amount in zatoshis.
+      "address" :                 (string) The transparent or Sapling address of the funding stream recipient.
+    }, ...
+  ]
+}
+
+Examples:
+> zcash-cli getblocksubsidy 1000
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblocksubsidy", "params": [1000] }' -H 'content-type: text/plain;' http://127.0.0.1:8232/
+

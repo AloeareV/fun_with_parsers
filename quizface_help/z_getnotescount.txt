@@ -1,0 +1,17 @@
+z_getnotescount
+
+Arguments:
+1. minconf      (numeric, optional, default=1) Only include notes in transactions confirmed at least this many times.
+
+Returns the number of sprout and sapling notes available in the wallet.
+
+Result:
+{
+  "sprout"      (numeric) the number of sprout notes in the wallet
+  "sapling"     (numeric) the number of sapling notes in the wallet
+}
+
+Examples:
+> zcash-cli z_getnotescount 0
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "z_getnotescount", "params": [0] }' -H 'content-type: text/plain;' http://127.0.0.1:8232/
+

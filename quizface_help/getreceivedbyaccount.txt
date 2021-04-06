@@ -1,0 +1,26 @@
+getreceivedbyaccount "account" ( minconf ) ( inZat )
+
+DEPRECATED. Returns the total amount received by addresses with <account> in transactions with at least [minconf] confirmations.
+
+Arguments:
+1. "account"      (string, required) MUST be set to the empty string "" to represent the default account. Passing any other string will result in an error.
+2. minconf        (numeric, optional, default=1) Only include transactions confirmed at least this many times.
+3. inZat           (bool, optional, default=false) Get the result amount in zatoshis (as an integer).
+
+Result:
+amount              (numeric) The total amount in ZEC(or zatoshis if inZat is true) received for this account.
+
+Examples:
+
+Amount received by the default account with at least 1 confirmation
+> zcash-cli getreceivedbyaccount ""
+
+Amount received at the tabby account including unconfirmed amounts with zero confirmations
+> zcash-cli getreceivedbyaccount "tabby" 0
+
+The amount with at least 6 confirmation, very safe
+> zcash-cli getreceivedbyaccount "tabby" 6
+
+As a json rpc call
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getreceivedbyaccount", "params": ["tabby", 6] }' -H 'content-type: text/plain;' http://127.0.0.1:8232/
+

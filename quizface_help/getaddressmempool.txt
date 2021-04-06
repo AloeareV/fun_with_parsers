@@ -1,0 +1,47 @@
+getaddressmempool {"addresses": ["taddr", ...]}
+
+Returns all mempool deltas for an address.
+
+WARNING: getaddressmempool is disabled.
+To enable it, restart zcashd with the following command line options:
+-experimentalfeatures and -insightexplorer or:
+-experimentalfeatures and -lightwalletd
+
+Alternatively add these two lines to the zcash.conf file:
+
+experimentalfeatures=1
+insightexplorer=1
+
+or:
+
+experimentalfeatures=1
+lightwalletd=1
+
+Arguments:
+{
+  "addresses":
+    [
+      "address"  (string) The base58check encoded address
+      ,...
+    ]
+}
+(or)
+"address"  (string) The base58check encoded address
+
+Result:
+[
+  {
+    "address"  (string) The base58check encoded address
+    "txid"  (string) The related txid
+    "index"  (number) The related input or output index
+    "satoshis"  (number) The difference of zatoshis
+    "timestamp"  (number) The time the transaction entered the mempool (seconds)
+    "prevtxid"  (string) The previous txid (if spending)
+    "prevout"  (string) The previous transaction output index (if spending)
+  }
+]
+
+Examples:
+> zcash-cli getaddressmempool '{"addresses": ["tmYXBYJj1K7vhejSec5osXK2QsGa5MTisUQ"]}'
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getaddressmempool", "params": [{"addresses": ["tmYXBYJj1K7vhejSec5osXK2QsGa5MTisUQ"]}] }' -H 'content-type: text/plain;' http://127.0.0.1:8232/
+

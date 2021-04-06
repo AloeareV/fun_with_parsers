@@ -1,0 +1,44 @@
+getaddresstxids {"addresses": ["taddr", ...], ("start": n), ("end": n)}
+
+Returns the txids for given transparent addresses within the given (inclusive)
+
+block height range, default is the full blockchain.
+
+WARNING: getaddresstxids is disabled.
+To enable it, restart zcashd with the following command line options:
+-experimentalfeatures and -insightexplorer or:
+-experimentalfeatures and -lightwalletd
+
+Alternatively add these two lines to the zcash.conf file:
+
+experimentalfeatures=1
+insightexplorer=1
+
+or:
+
+experimentalfeatures=1
+lightwalletd=1
+
+Arguments:
+{
+  "addresses":
+    [
+      "taddr"  (string) The base58check encoded address
+      ,...
+    ]
+  "start" (number, optional) The start block height
+  "end" (number, optional) The end block height
+}
+(or)
+"address"  (string) The base58check encoded address
+
+Result:
+[
+  "transactionid"  (string) The transaction id
+  ,...
+]
+
+Examples:
+> zcash-cli getaddresstxids '{"addresses": ["tmYXBYJj1K7vhejSec5osXK2QsGa5MTisUQ"], "start": 1000, "end": 2000}'
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getaddresstxids", "params": [{"addresses": ["tmYXBYJj1K7vhejSec5osXK2QsGa5MTisUQ"], "start": 1000, "end": 2000}] }' -H 'content-type: text/plain;' http://127.0.0.1:8232/
+
