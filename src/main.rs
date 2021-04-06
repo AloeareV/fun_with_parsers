@@ -1,7 +1,7 @@
 use regex::Regex;
 
 fn main() {
-    let validator = Regex::new(r"(?ms)\A(z_)?[[:alpha:]]+ .*?(Arguments:\n.*?)+(Result:\n.*?)+(Examples:\n.*?)+").unwrap();
+    let validator = Regex::new(r"(?ms)\A(z_)?[[:alpha:]]+ .*?(\nArguments:\n.*?)+(\nResult:\n.*?)+\nExamples:\n").unwrap();
     let example1 =
         std::fs::read_to_string("quizface_help/z_getoperationresult.txt")
             .unwrap();
