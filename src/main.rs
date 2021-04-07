@@ -12,25 +12,41 @@ macro_rules! output_parser {
     }
 }
 
-//macro_rules! parse_strings {
-//    ($($input:expr),+) =>
+macro_rules! parse_strings {
+    ($parser:expr;$($input:expr),+) => {
+        ($($parser.parse($input)),+)
+    }
+}
 
 fn read_help_output_file(name: &str) -> String {
-    std::fs::read_to_string(&format!("quizface_help/{}.txt", name)).unwrap()
+    std::fs::read_to_string(&format!("quizface_help/{}.txt", name))
+        .expect(&format!("No file: {}", name))
 }
 
 fn main() {
-    //    read_files!(getaddressbalance, z_getoperationresult, settxfee);
+    read_files!(getaddressbalance, z_getoperationresult, settxfee);
+    let parser = match_literal("z_")
+        .map(|_| "z_")
+        .maybe()
+        .map(str::to_string)
+        .extend(first_letter().one_or_more().parser);
+    dbg!(parse_strings!(
+        parser; &getaddressbalance,
+        &z_getoperationresult,
+        &settxfee
+    ));
+}
+
+fn first_letter<'a>() -> output_parser!(&'a str, char, &'a str) {
+    Parser::new(move |input: &'a str| match input.chars().next() {
+        Some(c) if c.is_ascii_alphabetic() => Ok((&input[1..], c)),
+        _ => Err(input),
+    })
 }
 
 fn match_literal<'a, 'b: 'a>(
     expected: &'b str,
-) -> Parser<
-    impl Fn(&'a str) -> Result<(&'a str, ()), &'a str> + Copy,
-    &'a str,
-    (),
-    &'a str,
-> {
+) -> output_parser!(&'a str, (), &'a str) {
     let f = move |input: &'a str| match input.get(0..expected.len()) {
         Some(next) if next == expected => Ok((&input[expected.len()..], ())),
         _ => Err(input),
@@ -38,14 +54,12 @@ fn match_literal<'a, 'b: 'a>(
     Parser::new(f)
 }
 
-use std::marker::PhantomData;
-
 struct Parser<F: Copy, I, O, E>
 where
     F: Fn(I) -> Result<(I, O), E>,
 {
     parser: F,
-    phantom: PhantomData<(I, O, E)>,
+    phantom: std::marker::PhantomData<(I, O, E)>,
 }
 
 impl<F: Fn(I) -> Result<(I, O), E> + Copy, I, O, E> Clone
@@ -67,7 +81,7 @@ where
     fn new(f: F) -> Self {
         Parser {
             parser: f,
-            phantom: PhantomData,
+            phantom: std::marker::PhantomData,
         }
     }
 
@@ -99,7 +113,17 @@ where
         Parser::new(move |input| self.parse(input).map(|(i, o)| (i, map_fn(o))))
     }
 
-    //    fn or(self, res: O) ->
+    fn extend<F2, O2, T>(self, other: F2) -> output_parser!(I, O, E)
+    where
+        F2: Fn(I) -> Result<(I, O2), E> + Copy,
+        O2: IntoIterator<Item = T>,
+        O: Extend<T>,
+    {
+        self.pair(other).map(|(mut o, o2)| {
+            o.extend(o2);
+            o
+        })
+    }
 }
 
 impl<F, I, O, E> Parser<F, I, O, E>
