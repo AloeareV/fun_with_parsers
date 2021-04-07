@@ -1,7 +1,30 @@
-fn main() {}
+macro_rules! read_files {
+    ($($file_name:ident),+) => {
+        let ($($file_name),+) = ($(read_help_output_file(stringify!($file_name))),+);
+    };
+}
 
-fn match_literal<'a>(
-    expected: &'static str,
+macro_rules! output_parser {
+    ($input_ty:ty, $output_ty:ty, $error_ty:ty) => {
+        Parser<impl Fn($input_ty) ->
+            Result<($input_ty, $output_ty), $error_ty> + Copy,
+            $input_ty, $output_ty, $error_ty>
+    }
+}
+
+//macro_rules! parse_strings {
+//    ($($input:expr),+) =>
+
+fn read_help_output_file(name: &str) -> String {
+    std::fs::read_to_string(&format!("quizface_help/{}.txt", name)).unwrap()
+}
+
+fn main() {
+    //    read_files!(getaddressbalance, z_getoperationresult, settxfee);
+}
+
+fn match_literal<'a, 'b: 'a>(
+    expected: &'b str,
 ) -> Parser<
     impl Fn(&'a str) -> Result<(&'a str, ()), &'a str> + Copy,
     &'a str,
@@ -52,10 +75,7 @@ where
         (self.parser)(input)
     }
 
-    fn pair<F2, O2>(
-        self,
-        other: F2,
-    ) -> Parser<impl Fn(I) -> Result<(I, (O, O2)), E> + Copy, I, (O, O2), E>
+    fn pair<F2, O2>(self, other: F2) -> output_parser!(I, (O, O2), E)
     where
         F2: Fn(I) -> Result<(I, O2), E> + Copy,
     {
@@ -72,15 +92,14 @@ where
         })
     }
 
-    fn map<M, O2>(
-        self,
-        map_fn: M,
-    ) -> Parser<impl Fn(I) -> Result<(I, O2), E> + Copy, I, O2, E>
+    fn map<M, O2>(self, map_fn: M) -> output_parser!(I, O2, E)
     where
         M: Fn(O) -> O2 + Copy,
     {
         Parser::new(move |input| self.parse(input).map(|(i, o)| (i, map_fn(o))))
     }
+
+    //    fn or(self, res: O) ->
 }
 
 impl<F, I, O, E> Parser<F, I, O, E>
@@ -88,9 +107,7 @@ where
     F: Fn(I) -> Result<(I, O), E> + Copy,
     I: Clone,
 {
-    fn zero_or_more(
-        self,
-    ) -> Parser<impl Fn(I) -> Result<(I, Vec<O>), E> + Copy, I, Vec<O>, E> {
+    fn zero_or_more(self) -> output_parser!(I, Vec<O>, E) {
         Parser::new(move |mut input: I| {
             let mut result = Vec::new();
             while let Ok((remaining_input, next_output)) =
@@ -110,6 +127,19 @@ where
         self.pair(self.zero_or_more().parser).map(|(x, mut xs)| {
             xs.insert(0, x);
             xs
+        })
+    }
+}
+
+impl<F, I, O, E> Parser<F, I, O, E>
+where
+    F: Fn(I) -> Result<(I, O), E> + Copy,
+    I: Clone,
+    O: Default,
+{
+    fn maybe(self) -> output_parser!(I, O, E) {
+        Parser::new(move |input: I| {
+            self.parse(input.clone()).or(Ok((input, O::default())))
         })
     }
 }
